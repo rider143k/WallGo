@@ -26,7 +26,8 @@ export default function WallpaperGrid() {
     const fetchWallpapers = async () => {
         setLoading(true);
         try {
-            const res = await fetch(`http://localhost:5000/api/wallpapers`);
+            const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
+            const res = await fetch(`${apiUrl}/api/wallpapers`);
             const data = await res.json();
             setWallpapers(data);
         } catch (err) {

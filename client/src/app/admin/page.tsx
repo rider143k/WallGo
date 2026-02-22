@@ -24,7 +24,8 @@ export default function AdminPage() {
     const categories = ['Nature', 'Abstract', 'Architecture', 'Technology', 'Animals', 'Minimal'];
 
     const fetchWallpapers = async () => {
-        const res = await fetch('http://localhost:5000/api/wallpapers');
+        const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
+        const res = await fetch(`${apiUrl}/api/wallpapers`);
         const data = await res.json();
         setWallpapers(data);
     };
@@ -48,7 +49,8 @@ export default function AdminPage() {
         formData.append('tags', tags);
 
         try {
-            const res = await fetch('http://localhost:5000/api/wallpapers/upload', {
+            const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
+            const res = await fetch(`${apiUrl}/api/wallpapers/upload`, {
                 method: 'POST',
                 headers: {
                     'x-admin-secret': 'wallgo_secure_2026_xyz'
@@ -76,7 +78,8 @@ export default function AdminPage() {
     const handleDelete = async (id: string) => {
         if (!confirm('Are you sure you want to delete this wallpaper?')) return;
         try {
-            const res = await fetch(`http://localhost:5000/api/wallpapers/${id}`, {
+            const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
+            const res = await fetch(`${apiUrl}/api/wallpapers/${id}`, {
                 method: 'DELETE',
                 headers: {
                     'x-admin-secret': 'wallgo_secure_2026_xyz'
