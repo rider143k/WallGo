@@ -1,6 +1,6 @@
 # WallGo | Premium Monochromatic Wallpapers
 
-![WallGo Banner](https://images.unsplash.com/photo-1550684848-fac1c5b4e853?q=80&w=2070&auto=format&fit=crop)
+![WallGo Banner](E:\WallGo\server\scripts\Screenshot 2026-02-22 142930.png)
 
 WallGo is a high-end, minimalist wallpaper destination designed for enthusiasts of monochromatic aesthetics. Built with **Next.js**, **Node.js**, **Express**, and **MongoDB**, it offers a seamless experience for discovering and downloading high-definition wallpapers tailored specifically for both PC and Mobile devices.
 

@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const Wallpaper = require('../models/Wallpaper');
 const { upload, cloudinary } = require('../config/cloudinary');
+const slugify = require('slugify');
 
 // Professional Secret Key (Simple but Effective)
 const ADMIN_SECRET = 'wallgo_secure_2026_xyz';
@@ -14,6 +15,20 @@ const authGuard = (req, res, next) => {
         res.status(403).json({ message: 'UNAUTHORIZED ACCESS' });
     }
 };
+
+// @route   GET /api/wallpapers/slug/:slug
+// @desc    Get single wallpaper by slug
+router.get('/slug/:slug', async (req, res) => {
+    try {
+        const wallpaper = await Wallpaper.findOne({ slug: req.params.slug });
+        if (!wallpaper) {
+            return res.status(404).json({ message: 'Wallpaper not found' });
+        }
+        res.json(wallpaper);
+    } catch (err) {
+        res.status(500).json({ message: err.message });
+    }
+});
 
 // @route   GET /api/wallpapers
 // @desc    Get all wallpapers
@@ -56,28 +71,31 @@ router.post('/upload', authGuard, (req, res, next) => {
     });
 }, async (req, res) => {
     try {
-        const { title, category, tags } = req.body;
-        console.log('Upload Request Body:', req.body);
-        console.log('Uploaded File:', req.file);
+        const { title, category, tags, description, type } = req.body;
 
         if (!req.file) {
             return res.status(400).json({ message: 'Please upload an image' });
         }
 
+        // Generate base slug
+        let baseSlug = slugify(title, { lower: true, strict: true });
+        // Ensure uniqueness by adding a short random string
+        let slug = `${baseSlug}-${Math.random().toString(36).substring(2, 7)}`;
+
         const newWallpaper = new Wallpaper({
-            title: req.body.title,
+            title,
+            slug,
+            description: description || `Download high quality ${title} 4K wallpaper for your desktop or mobile. Beautiful ${category} themed background available for free.`,
             imageUrl: req.file.path,
             publicId: req.file.filename,
-            category: req.body.category,
-            type: req.body.type || 'Desktop',
-            tags: req.body.tags ? req.body.tags.split(',').map(tag => tag.trim()) : [],
+            category,
+            type: type || 'Desktop',
+            tags: tags ? tags.split(',').map(tag => tag.trim()) : [],
         });
 
         const savedWallpaper = await newWallpaper.save();
-        console.log('Wallpaper Saved:', savedWallpaper);
         res.status(201).json(savedWallpaper);
     } catch (err) {
-        console.error('Database Save Error:', err);
         res.status(500).json({ message: err.message });
     }
 });
@@ -98,6 +116,53 @@ router.delete('/:id', authGuard, async (req, res) => {
         await wallpaper.deleteOne();
 
         res.json({ message: 'Wallpaper deleted successfully' });
+    } catch (err) {
+        res.status(500).json({ message: err.message });
+    }
+});
+
+// @route   PUT /api/wallpapers/:id
+// @desc    Update wallpaper metadata
+router.put('/:id', authGuard, async (req, res) => {
+    try {
+        const { title, category, tags, description, type } = req.body;
+        const wallpaper = await Wallpaper.findById(req.params.id);
+
+        if (!wallpaper) {
+            return res.status(404).json({ message: 'Wallpaper not found' });
+        }
+
+        if (title) {
+            wallpaper.title = title;
+            // Regenerate slug if title changes to keep URLs consistent and unique
+            const baseSlug = slugify(title, { lower: true, strict: true });
+            wallpaper.slug = `${baseSlug}-${Math.random().toString(36).substring(2, 7)}`;
+        }
+        if (category) wallpaper.category = category;
+        if (description) wallpaper.description = description;
+        if (type) wallpaper.type = type;
+        if (tags) wallpaper.tags = Array.isArray(tags) ? tags : tags.split(',').map(tag => tag.trim());
+
+        const updatedWallpaper = await wallpaper.save();
+        res.json(updatedWallpaper);
+    } catch (err) {
+        res.status(500).json({ message: err.message });
+    }
+});
+
+// @route   PATCH /api/wallpapers/download/:id
+// @desc    Increment download count
+router.patch('/download/:id', async (req, res) => {
+    try {
+        const wallpaper = await Wallpaper.findByIdAndUpdate(
+            req.params.id,
+            { $inc: { downloads: 1 } },
+            { new: true }
+        );
+        if (!wallpaper) {
+            return res.status(404).json({ message: 'Wallpaper not found' });
+        }
+        res.json({ downloads: wallpaper.downloads });
     } catch (err) {
         res.status(500).json({ message: err.message });
     }

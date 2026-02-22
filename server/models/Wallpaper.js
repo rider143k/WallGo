@@ -5,6 +5,16 @@ const WallpaperSchema = new mongoose.Schema({
         type: String,
         required: true,
     },
+    slug: {
+        type: String,
+        required: true,
+        unique: true,
+        index: true
+    },
+    description: {
+        type: String,
+        default: ''
+    },
     imageUrl: {
         type: String,
         required: true,
@@ -15,13 +25,13 @@ const WallpaperSchema = new mongoose.Schema({
     },
     type: {
         type: String,
-        enum: ['Desktop', 'Mobile'],
+        enum: ['Desktop', 'Mobile', 'DP'],
         required: true,
         default: 'Desktop'
     },
     category: {
         type: String,
-        enum: ['Nature', 'Abstract', 'Architecture', 'Technology', 'Animals', 'Minimal'],
+        enum: ['Nature', 'Abstract', 'Architecture', 'Technology', 'Animals', 'Minimal', 'Cricket', 'DP'],
         default: 'Nature',
     },
     tags: [String],
@@ -29,6 +39,10 @@ const WallpaperSchema = new mongoose.Schema({
         type: Date,
         default: Date.now,
     },
+    downloads: {
+        type: Number,
+        default: 0
+    }
 });
 
 module.exports = mongoose.model('Wallpaper', WallpaperSchema);
