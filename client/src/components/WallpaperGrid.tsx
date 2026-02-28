@@ -28,7 +28,9 @@ export default function WallpaperGrid({ initialCategory = 'All' }: { initialCate
         setLoading(true);
         try {
             const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
-            const res = await fetch(`${apiUrl}/api/wallpapers`);
+            // Use shuffle=true when in 'All' category for professional discovery
+            const shuffleParams = activeCategory === 'All' ? '?shuffle=true' : '';
+            const res = await fetch(`${apiUrl}/api/wallpapers${shuffleParams}`);
             const data = await res.json();
             setWallpapers(data);
         } catch (err) {
@@ -40,7 +42,7 @@ export default function WallpaperGrid({ initialCategory = 'All' }: { initialCate
 
     useEffect(() => {
         fetchWallpapers();
-    }, []);
+    }, [activeCategory]);
 
     const handleDownload = async (wp: Wallpaper) => {
         try {

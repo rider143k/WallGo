@@ -31,10 +31,10 @@ router.get('/slug/:slug', async (req, res) => {
 });
 
 // @route   GET /api/wallpapers
-// @desc    Get all wallpapers
+// @desc    Get all wallpapers (with optional shuffle)
 router.get('/', async (req, res) => {
     try {
-        const { category, search, type } = req.query;
+        const { category, search, type, shuffle } = req.query;
         let query = {};
 
         if (category && category !== 'All') {
@@ -52,8 +52,40 @@ router.get('/', async (req, res) => {
             ];
         }
 
+        // If shuffle is requested and no specific filters are applied, use aggregation
+        if (shuffle === 'true' && !search && (!category || category === 'All')) {
+            const wallpapers = await Wallpaper.aggregate([{ $sample: { size: 50 } }]);
+            return res.json(wallpapers);
+        }
+
         const wallpapers = await Wallpaper.find(query).sort({ createdAt: -1 });
         res.json(wallpapers);
+    } catch (err) {
+        res.status(500).json({ message: err.message });
+    }
+});
+
+// @route   GET /api/wallpapers/related/:id
+// @desc    Get related wallpapers based on tags and category
+router.get('/related/:id', async (req, res) => {
+    try {
+        const wallpaper = await Wallpaper.findById(req.params.id);
+        if (!wallpaper) {
+            return res.status(404).json({ message: 'Wallpaper not found' });
+        }
+
+        // Semantic Match: Same category OR overlapping tags
+        const related = await Wallpaper.find({
+            _id: { $ne: wallpaper._id },
+            $or: [
+                { category: wallpaper.category },
+                { tags: { $in: wallpaper.tags } }
+            ]
+        }).limit(20);
+
+        // Shuffle the results locally for variety
+        const shuffled = related.sort(() => 0.5 - Math.random()).slice(0, 12);
+        res.json(shuffled);
     } catch (err) {
         res.status(500).json({ message: err.message });
     }

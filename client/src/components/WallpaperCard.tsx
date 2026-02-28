@@ -13,6 +13,15 @@ interface Wallpaper {
 
 export default function WallpaperCard({ wallpaper }: { wallpaper: Wallpaper }) {
     const handleDownload = () => {
+        // Track GA Event
+        if (typeof window !== 'undefined' && (window as any).gtag) {
+            (window as any).gtag('event', 'wallpaper_download', {
+                'title': wallpaper.title,
+                'slug': wallpaper.slug,
+                'id': wallpaper._id
+            });
+        }
+
         const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
         try {
             fetch(`${apiUrl}/api/wallpapers/download/${wallpaper._id}`, { method: 'PATCH' }).catch(() => { });

@@ -2,6 +2,7 @@ import { Metadata } from 'next';
 import Image from 'next/image';
 import Link from 'next/link';
 import WallpaperGrid from '@/components/WallpaperGrid';
+import CategoryTracker from '../../../components/CategoryTracker';
 
 async function getCategoryInfo(category: string) {
     // In a real app, this might come from a DB or CMS. 
@@ -49,6 +50,7 @@ export default async function CategoryPage({ params }: { params: Promise<{ categ
 
     return (
         <main className="min-h-screen pt-40 pb-20">
+            <CategoryTracker category={category} />
             <div className="max-w-7xl mx-auto px-6">
                 <header className="mb-20 text-center max-w-4xl mx-auto">
                     <h1 className="text-6xl md:text-8xl font-black tracking-tighter mb-8 uppercase italic">

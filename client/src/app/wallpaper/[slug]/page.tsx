@@ -20,13 +20,11 @@ async function getWallpaper(slug: string) {
     }
 }
 
-async function getRelatedWallpapers(category: string, type: string, currentId: string) {
+async function getRelatedWallpapers(id: string) {
     const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
-    const res = await fetch(`${apiUrl}/api/wallpapers?category=${category}`, { next: { revalidate: 3600 } });
+    const res = await fetch(`${apiUrl}/api/wallpapers/related/${id}`, { next: { revalidate: 3600 } });
     if (!res.ok) return [];
-    const data = await res.json();
-    // Filter by type too for better UX, except for category 'All' matches
-    return data.filter((w: any) => w._id !== currentId && w.type === type).slice(0, 12);
+    return res.json();
 }
 
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
@@ -73,7 +71,7 @@ export default async function WallpaperPage({ params }: { params: Promise<{ slug
         );
     }
 
-    const related = await getRelatedWallpapers(wallpaper.category, wallpaper.type, wallpaper._id);
+    const related = await getRelatedWallpapers(wallpaper._id);
 
     // JSON-LD Structured Data
     const jsonLd = {
