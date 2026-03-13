@@ -47,7 +47,7 @@ export default function AdminPage() {
         }
     };
 
-    const categories = ['DP', 'Nature', 'Abstract', 'Architecture', 'Technology', 'Animals', 'Minimal', 'Cricket'];
+    const categories = ['Anime', 'DP', 'Nature', 'Abstract', 'Architecture', 'Technology', 'Animals', 'Minimal', 'Cricket'];
 
     const fetchWallpapers = async () => {
         const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';

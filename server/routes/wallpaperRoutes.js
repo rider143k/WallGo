@@ -54,7 +54,7 @@ router.get('/', async (req, res) => {
 
         // If shuffle is requested and no specific filters are applied, use aggregation
         if (shuffle === 'true' && !search && (!category || category === 'All')) {
-            const wallpapers = await Wallpaper.aggregate([{ $sample: { size: 50 } }]);
+            const wallpapers = await Wallpaper.aggregate([{ $sample: { size: 500 } }]);
             return res.json(wallpapers);
         }
 
@@ -103,6 +103,7 @@ router.post('/upload', authGuard, (req, res, next) => {
     });
 }, async (req, res) => {
     try {
+        console.log('Upload Request Body:', req.body);
         const { title, category, tags, description, type } = req.body;
 
         if (!req.file) {

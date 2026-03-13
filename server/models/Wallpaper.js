@@ -31,7 +31,7 @@ const WallpaperSchema = new mongoose.Schema({
     },
     category: {
         type: String,
-        enum: ['Nature', 'Abstract', 'Architecture', 'Technology', 'Animals', 'Minimal', 'Cricket', 'DP'],
+        enum: ['Nature', 'Abstract', 'Architecture', 'Technology', 'Animals', 'Minimal', 'Cricket', 'DP', 'Space', 'Travel', 'Anime'],
         default: 'Nature',
     },
     tags: [String],

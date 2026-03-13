@@ -22,7 +22,7 @@ export default function WallpaperGrid({ initialCategory = 'All' }: { initialCate
     const [activeType, setActiveType] = useState('Desktop');
     const [searchQuery, setSearchQuery] = useState('');
 
-    const categories = ['All', 'DP', 'Nature', 'Abstract', 'Architecture', 'Technology', 'Animals', 'Minimal', 'Cricket'];
+    const categories = ['All', 'Anime', 'DP', 'Nature', 'Abstract', 'Architecture', 'Technology', 'Animals', 'Minimal', 'Cricket', 'Space', 'Travel'];
 
     const fetchWallpapers = async () => {
         setLoading(true);
